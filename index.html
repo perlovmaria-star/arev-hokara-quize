@@ -1,0 +1,566 @@
+<div id="quiz-root" dir="rtl" lang="he"></div>
+<style>
+  #quiz-root {
+    --bg-deep: #241129;
+    --bg-deep2: #341a3d;
+    --purple: #7a3b82;
+    --purple-dark: #5a2a63;
+    --lavender: #c9a0dc;
+    --pink: #f0a8c4;
+    --gold: #e8b84b;
+    --cream: #fbf3fa;
+    --muted: #cbb3d1;
+    font-family: 'Assistant', 'Heebo', sans-serif;
+    position: relative;
+    width: 100%;
+    min-height: 640px;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(240,168,196,0.18), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(232,184,75,0.12), transparent 40%),
+      linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-deep2) 55%, #2c1533 100%);
+    color: var(--cream);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  #quiz-root * { box-sizing: border-box; }
+  #quiz-root .qz-font-display { font-family: 'Heebo', sans-serif; font-weight: 900; }
+  #quiz-root .qz-screen {
+    position: relative;
+    padding: 34px 26px 26px;
+    min-height: 640px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    animation: qz-fade-in .5s ease;
+    text-align: center;
+  }
+  @keyframes qz-fade-in { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:translateY(0);} }
+  #quiz-root .qz-ring-wrap { position: relative; width: 140px; height: 140px; display:flex; align-items:center; justify-content:center; }
+  #quiz-root .qz-ring-glow {
+    position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle, rgba(240,168,196,0.35), transparent 70%);
+    filter: blur(6px);
+    animation: qz-pulse 3s ease-in-out infinite;
+  }
+  @keyframes qz-pulse { 0%,100%{transform:scale(1); opacity:.8;} 50%{transform:scale(1.08); opacity:1;} }
+  #quiz-root .qz-heartbeat { display:inline-block; animation: qz-heartbeat 2.4s ease-in-out infinite; }
+  @keyframes qz-heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  #quiz-root .qz-title-main {
+    font-size: 27px; line-height:1.3; color: var(--cream);
+    text-shadow: 0 2px 18px rgba(240,168,196,0.35);
+  }
+  #quiz-root .qz-subtitle { color: var(--muted); font-size: 14.5px; max-width: 420px; }
+  #quiz-root .qz-btn {
+    font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
+    padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer;
+    background: var(--purple);
+    color: #fff; box-shadow: 0 8px 24px rgba(122,59,130,0.45);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  #quiz-root .qz-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(122,59,130,0.6); background: var(--purple-dark); }
+  #quiz-root .qz-btn:active { transform: translateY(0); }
+  #quiz-root .qz-btn.qz-secondary {
+    background: transparent; border: 1.5px solid var(--lavender); color: var(--lavender); box-shadow:none;
+    padding: 11px 26px; font-size: 14px;
+  }
+  #quiz-root .qz-input {
+    font-size: 17px; padding: 13px 18px; border-radius: 14px; border: 1.5px solid rgba(201,160,220,0.4);
+    background: rgba(255,255,255,0.06); color: var(--cream); text-align:center; width: 260px;
+    outline: none; font-family: inherit;
+  }
+  #quiz-root .qz-input:focus { border-color: var(--pink); }
+  #quiz-root .qz-input::placeholder { color: var(--muted); }
+  #quiz-root .qz-eyebrow {
+    font-size: 12.5px; letter-spacing: 3px; color: var(--pink); text-transform: uppercase; font-weight: 700;
+  }
+  #quiz-root .qz-qr-box {
+    background: #fff; padding: 14px; border-radius: 18px; display:inline-flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35); border: 3px solid var(--gold);
+  }
+  #quiz-root .qz-qr-hint { font-size: 12.5px; color: var(--muted); max-width: 300px; }
+  #quiz-root .qz-error { color: var(--pink); font-size: 14px; min-height: 18px; }
+  #quiz-root .qz-qnum { color: var(--muted); font-size: 13.5px; letter-spacing: 1px; }
+  #quiz-root .qz-progress-track { width:100%; max-width:420px; height:6px; background: rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; }
+  #quiz-root .qz-progress-fill { height:100%; background: linear-gradient(90deg, var(--pink), var(--gold)); border-radius:6px; transition: width .35s ease; }
+  #quiz-root .qz-question-text {
+    font-size: 24px; max-width: 500px; line-height: 1.4; margin: 4px 0 6px;
+  }
+  #quiz-root .qz-options { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; width:100%; max-width: 520px; }
+  #quiz-root .qz-opt {
+    font-size: 16px; font-weight: 600; padding: 18px 14px; border-radius: 16px; cursor:pointer;
+    border: 1.5px solid rgba(255,255,255,0.15); color: var(--cream); text-align:center;
+    background: rgba(255,255,255,0.06); transition: all .15s ease; min-height: 70px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #quiz-root .qz-opt:hover { border-color: var(--pink); background: rgba(240,168,196,0.12); transform: translateY(-2px); }
+  #quiz-root .qz-opt.qz-selected { border-color: var(--gold); background: rgba(232,184,75,0.18); }
+  #quiz-root .qz-opt.qz-correct { border-color: #7fd68a; background: rgba(127,214,138,0.22); }
+  #quiz-root .qz-opt.qz-wrong { border-color: #e08a8a; background: rgba(224,138,138,0.18); opacity:.7; }
+  #quiz-root .qz-opt.qz-disabled { pointer-events:none; }
+  #quiz-root .qz-timer-mid { position: relative; width: 78px; height: 78px; margin: 0 auto; }
+  #quiz-root .qz-timer-mid svg { transform: rotate(-90deg); }
+  #quiz-root .qz-timer-mid circle { fill: none; stroke-width: 6; }
+  #quiz-root .qz-timer-bg { stroke: rgba(255,255,255,0.12); }
+  #quiz-root .qz-timer-fg { stroke: var(--gold); stroke-linecap: round; transition: stroke-dashoffset .1s linear, stroke .2s ease; }
+  #quiz-root .qz-timer-fg.qz-timer-urgent { stroke: var(--pink); }
+  #quiz-root .qz-timer-num {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'Heebo'; font-weight:900; font-size: 24px; color: var(--gold);
+  }
+  #quiz-root .qz-winner-ring {
+    width: 120px; height:120px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, rgba(232,184,75,0.35), transparent 70%);
+    animation: qz-pulse 2.2s ease-in-out infinite;
+    font-size: 44px;
+  }
+  #quiz-root .qz-alert-banner {
+    font-family: 'Heebo', sans-serif; font-weight: 800; font-size: 17px;
+    background: linear-gradient(135deg, var(--gold), var(--pink));
+    color: #241129; padding: 12px 26px; border-radius: 100px;
+    box-shadow: 0 8px 24px rgba(232,184,75,0.35);
+    animation: qz-fade-in .5s ease;
+  }
+  #quiz-root .qz-final-msg {
+    max-width: 440px; font-size: 15px; line-height: 1.85; color: var(--cream);
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(201,160,220,0.25);
+    border-radius: 18px; padding: 20px 24px;
+  }
+  #quiz-root .qz-small { font-size: 12.5px; color: var(--muted); }
+  #quiz-root .qz-leaderboard { width: 100%; max-width: 480px; display:flex; flex-direction:column; gap:9px; max-height: 420px; overflow-y:auto; }
+  #quiz-root .qz-lb-row {
+    display:flex; align-items:center; justify-content:space-between; padding: 11px 18px;
+    border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,160,220,0.2);
+  }
+  #quiz-root .qz-lb-row.qz-lb-first { border-color: var(--gold); background: rgba(232,184,75,0.15); }
+  #quiz-root .qz-lb-rank { font-family:'Heebo'; font-weight:900; color: var(--pink); width: 26px; flex-shrink:0; }
+  #quiz-root .qz-lb-name { flex:1; text-align: right; margin-right: 10px; font-weight:600; font-size:14px; }
+  #quiz-root .qz-lb-score { font-family:'Heebo'; font-weight:800; color: var(--gold); font-size:14px; flex-shrink:0; }
+  #quiz-root .qz-lb-progress { font-size: 11px; color: var(--lavender); flex-shrink:0; }
+  #quiz-root .qz-reset-link { font-size: 11px; color: rgba(203,179,209,0.5); text-decoration: underline; cursor: pointer; background:none; border:none; margin-top: 6px; }
+  #quiz-root .qz-warn-banner {
+    max-width: 420px; font-size: 13px; line-height: 1.6; color: #fbdede;
+    background: rgba(224,138,138,0.18); border: 1.5px solid #e08a8a;
+    border-radius: 14px; padding: 12px 18px;
+  }
+  #quiz-root .qz-consent-card {
+    max-width: 440px; font-size: 14px; line-height: 1.8; color: var(--cream); text-align: right;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(201,160,220,0.25);
+    border-radius: 18px; padding: 18px 20px;
+  }
+  #quiz-root .qz-consent-card ul { margin: 6px 0 0; padding-right: 18px; }
+  #quiz-root .qz-consent-card li { margin-bottom: 4px; }
+  #quiz-root .qz-check-row {
+    display:flex; align-items:flex-start; gap:10px; max-width: 440px; text-align:right;
+    font-size: 13.5px; color: var(--muted); cursor:pointer;
+  }
+  #quiz-root .qz-timing-card {
+    max-width: 420px; font-size: 19px; font-weight: 700; line-height: 1.6; color: var(--cream); text-align: center;
+    background: linear-gradient(135deg, rgba(232,184,75,0.22), rgba(240,168,196,0.18));
+    border: 1.5px solid var(--gold);
+    border-radius: 20px; padding: 26px 24px;
+  }
+  #quiz-root .qz-confetti-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
+  #quiz-root .qz-confetti-piece { position: absolute; top: -24px; opacity: 0.95; animation-name: qz-confetti-fall; animation-timing-function: ease-in; animation-fill-mode: forwards; border-radius: 2px; }
+  @keyframes qz-confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: translateY(680px) rotate(500deg); opacity: 0; }
+  }
+  @media (max-width: 480px) {
+    #quiz-root .qz-options { grid-template-columns: 1fr; }
+    #quiz-root .qz-question-text { font-size: 20px; }
+    #quiz-root .qz-timer-mid { width: 66px; height: 66px; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+(function(){
+  const QUESTIONS = [
+    { q: "כמה ילדים יש לך?", opts: ["1","2","4 ומעלה","6 ומעלה (את כבר מנהלת מוסד חינוכי)"], correct: 3 },
+    { q: "כמה ימי מילואים כבר ספגת?", opts: ["עד 100","100-250","250-500","כבר הפסקתי לחשב. תעדכנו כשהמלחמה נגמרת."], correct: 3 },
+    { q: "מה מצבך עם קרן הסיוע?", opts: ["לא הגשתי.","הגשתי פעם אחת והתייאשתי.","הגשתי את כל מה שמגיע לי ומחכה לתשובה.","הגשתי, קיבלתי, ועכשיו אני מסבירה לאחרות איך להגיש."], correct: 3 },
+    { q: "יש לך עזרה מההורים?", opts: ["כן, בלעדיהם לא הייתי שורדת.","עוזרים כשאפשר.","יש עזרה, אבל עם ריבית רגשית.","אמא שלי מתקשרת לשאול אם אני יכולה לעזור להם."], correct: 3 },
+    { q: 'כמה פעמים אמרת השבוע "עזבי, אני אעשה את זה לבד"?', opts: ["פעם.","כמה פעמים.","כמעט כל יום.","זו כבר לא אמירה. זו תוכנית עבודה."], correct: 3 },
+    { q: 'כמה פעמים שמעת את המשפט "אבל אתם כבר גרושים..."?', opts: ["פעם אחת.","כמה פעמים.","יותר מדי פעמים.","אם הייתי מקבלת שקל על כל פעם, לא הייתי צריכה קרן סיוע."], correct: 3 },
+    { q: 'כמה פעמים הסברת למישהו מה זה בכלל "גרושה של מילואימניק"?', opts: ["פעם אחת.","כמה פעמים.","איבדתי ספירה.","אני כבר יכולה להעביר על זה הרצאה."], correct: 3 },
+    { q: "מה הכי מרגש אותך לקבל?", opts: ["יום בלי כביסות.","קפה חם.","קרם גוף.","הודעה מהבנק: \"הופקדה העברה\"."], correct: 3 },
+    { q: 'כמה פעמים אמרת השנה "אין לי כוח"?', opts: ["פעם-פעמיים.","פעם בשבוע.","כמעט כל יום.","זו כבר לא תחושה. זו זהות."], correct: 3 },
+    { q: "כמה פעמים פתחת את הטלפון כדי לבדוק אם נכנס כסף?", opts: ["פעם ביום.","כמה פעמים ביום.","כל פעם שיש התראה.","אני כבר יודעת לזהות את האפליקציה לפי הצליל."], correct: 3 },
+    { q: "מה הסיכוי שהדר מרקס תצא מהערב הזה עם עוד חומר למופע?", opts: ["נמוך","בינוני","גבוה","אנחנו מופע שלם."], correct: 3 },
+    { q: "מה הדבר הראשון שהדר תעשה כשתגיע הביתה?", opts: ["תספר על הערב לבן הזוג שלה.","תכתוב רעיונות.","תתקשר לסוכנת.","תבדוק שאנחנו לא דורשות תמלוגים. 😂"], correct: 3 },
+  ];
+  const HOST_PIN = '2026';
+  // Paste the Google Apps Script Web App URL here after deploying it (see deployment instructions):
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwBzUhEKsa7EbxMqxlgCISCQwMItzxd7qpfRFJzj2YnXU423Qyrv7-0KKILnxcEHCo5/exec';
+  const QUESTION_SECONDS = 20;
+  const FEEDBACK_MS = 700;
+  const root = document.getElementById('quiz-root');
+  let state = {
+    view: 'landing', name: '', playerId: '',
+    qIndex: 0, correctCount: 0, quizStartAt: 0, questionStartAt: 0, selectedIdx: null, locked: false,
+    qTimer: null, players: []
+  };
+
+  function uid(){ return 'p' + Math.random().toString(36).slice(2,10); }
+  function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function fmtTime(ms){ return (ms/1000).toFixed(1) + ' שנ׳'; }
+
+  function sheetsConfigured(){ return /^https:\/\//.test(SHEETS_URL); }
+
+  async function apiPost(payload){
+    if (!sheetsConfigured()) return false;
+    try {
+      // Apps Script POST responses go through a redirect whose body browsers
+      // often can't read due to CORS, even when the write itself succeeds.
+      // Fire the write with no-cors (can't read the response) and verify
+      // success separately via a GET re-fetch.
+      await fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      return true;
+    } catch(e){ return false; }
+  }
+
+  async function apiVerifyPlayer(pid, expected){
+    for (let attempt = 0; attempt < 3; attempt++){
+      await new Promise(r => setTimeout(r, 500));
+      const players = await apiGetPlayers();
+      const found = players.find(p => p.playerId === pid);
+      if (found &&
+          Number(found.correctCount) === expected.correctCount &&
+          (found.finished === true || found.finished === 'true' || found.finished === 'TRUE') === expected.finished){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function apiGetPlayers(){
+    if (!sheetsConfigured()) return [];
+    try {
+      const res = await fetch(SHEETS_URL + '?t=' + Date.now());
+      const data = await res.json();
+      return (data && data.players) ? data.players : [];
+    } catch(e){ return []; }
+  }
+
+  async function setPlayer(pid, data){
+    await apiPost({ action: 'upsert', playerId: pid, name: data.name, correctCount: data.correctCount, totalTimeMs: data.totalTimeMs, finished: data.finished, joinedAt: data.joinedAt });
+  }
+
+  async function getAllPlayers(){
+    const raw = await apiGetPlayers();
+    const out = raw.map(p => ({
+      name: p.name,
+      correctCount: Number(p.correctCount) || 0,
+      totalTimeMs: Number(p.totalTimeMs) || 0,
+      finished: (p.finished === true || p.finished === 'true' || p.finished === 'TRUE'),
+      joinedAt: Number(p.joinedAt) || 0
+    }));
+    out.sort((a,b) => {
+      const af = a.finished ? 1 : 0, bf = b.finished ? 1 : 0;
+      if (af !== bf) return bf - af;
+      if (a.correctCount !== b.correctCount) return (b.correctCount||0) - (a.correctCount||0);
+      return (a.totalTimeMs||Infinity) - (b.totalTimeMs||Infinity);
+    });
+    return out;
+  }
+
+  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.landing(); root.appendChild(el); }
+  function h(tag, attrs, children){
+    const el = document.createElement(tag);
+    if (attrs) for (const k in attrs){
+      if (k === 'class') el.className = attrs[k];
+      else if (k === 'style') el.setAttribute('style', attrs[k]);
+      else if (k === 'html') el.innerHTML = attrs[k];
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), attrs[k]);
+      else el.setAttribute(k, attrs[k]);
+    }
+    (children||[]).forEach(c => { if (c) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return el;
+  }
+
+  async function checkStorageHealth(){
+    if (!sheetsConfigured()) return false;
+    try {
+      const res = await fetch(SHEETS_URL + '?t=' + Date.now());
+      const data = await res.json();
+      return !!(data && Array.isArray(data.players));
+    } catch(e){ return false; }
+  }
+
+  function clearQTimer(){ if (state.qTimer){ clearInterval(state.qTimer); state.qTimer = null; } }
+
+  function spawnConfetti(container){
+    const colors = ['#e8b84b', '#f0a8c4', '#c9a0dc', '#fbf3fa', '#7a3b82'];
+    for (let i = 0; i < 44; i++){
+      const piece = document.createElement('div');
+      piece.className = 'qz-confetti-piece';
+      const size = 6 + Math.random()*6;
+      const isRound = Math.random() > 0.5;
+      piece.style.width = size + 'px';
+      piece.style.height = (isRound ? size : size*1.6) + 'px';
+      piece.style.borderRadius = isRound ? '50%' : '2px';
+      piece.style.left = (Math.random()*100) + '%';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDuration = (3.2 + Math.random()*2.2) + 's';
+      piece.style.animationDelay = (Math.random()*0.7) + 's';
+      container.appendChild(piece);
+    }
+  }
+
+  // ---------- LANDING: game explanation (no QR here — QR lives in a separate slide) ----------
+  function ScreenLanding(){
+    const wrap = h('div', {class:'qz-screen'});
+    wrap.appendChild(h('div', {class:'qz-ring-wrap'}, [
+      h('div', {class:'qz-ring-glow'}),
+      h('div', {class:'qz-font-display qz-heartbeat', style:'font-size:42px; z-index:1;'}, ['🩷'])
+    ]));
+    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['לפני שמתחילים']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['מי באמת מבינה את החיים שלנו?']));
+    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ענו על 12 שאלות ותיהיו מנצחות הערב']));
+    wrap.appendChild(h('div', {class:'qz-timing-card'}, ['לכל שאלה יש 20 שניות בדיוק לענות. אם הזמן נגמר בלי בחירה, המשחק ממשיך אוטומטית לשאלה הבאה.']));
+    wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='name'; render(); }}, ['בואי נתחיל']));
+    wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.view='host-pin'; render(); }}, ['כניסת מנחה']));
+    const warnBox = h('div', {id:'qz-storage-warn'});
+    wrap.appendChild(warnBox);
+    checkStorageHealth().then(ok => {
+      if (!ok && root.querySelector('#qz-storage-warn')){
+        root.querySelector('#qz-storage-warn').appendChild(h('div', {class:'qz-warn-banner'}, ['⚠️ אין חיבור לגיליון השמירה כרגע. יכול להיות שהתשובות לא יישמרו. אנא נסי לרענן, ואם זה ממשיך — הודיעי למנחה.']));
+      }
+    });
+    return wrap;
+  }
+
+  // ---------- NAME ENTRY ----------
+  function ScreenName(){
+    const wrap = h('div', {class:'qz-screen'});
+    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['הצטרפות למשחק']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:22px;'}, ['מה השם המלא שלך?']));
+    const nameInput = h('input', {class:'qz-input', placeholder:'שם מלא'});
+    wrap.appendChild(nameInput);
+    const err = h('div', {class:'qz-error'});
+    wrap.appendChild(err);
+    wrap.appendChild(h('button', {class:'qz-btn', onclick: async () => {
+      const name = nameInput.value.trim();
+      if (!name){ err.textContent = 'נא להזין שם'; return; }
+      const pid = uid();
+      await setPlayer(pid, { name, correctCount: 0, totalTimeMs: 0, finished: false, joinedAt: Date.now() });
+      state.playerId = pid; state.name = name;
+      state.qIndex = 0; state.correctCount = 0; state.selectedIdx = null; state.locked = false;
+      state.quizStartAt = Date.now();
+      state.view = 'question'; render();
+    }}, ['התחילי לשחק']));
+    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
+    setTimeout(() => nameInput.focus(), 50);
+    return wrap;
+  }
+
+  // ---------- QUESTION: self-paced, 10s timer centered ----------
+  function ScreenQuestion(){
+    const qi = state.qIndex;
+    const q = QUESTIONS[qi];
+    const wrap = h('div', {class:'qz-screen'});
+
+    const circumference = 2 * Math.PI * 33;
+    const timerHtml = '<div class="qz-timer-mid" id="qz-qtimer"><svg width="78" height="78"><circle class="qz-timer-bg" cx="39" cy="39" r="33"/><circle class="qz-timer-fg" cx="39" cy="39" r="33" style="stroke-dasharray:'+circumference+'; stroke-dashoffset:0;"/></svg><div class="qz-timer-num" id="qz-qtimer-num">'+QUESTION_SECONDS+'</div></div>';
+    wrap.appendChild(h('div', {html: timerHtml}));
+    wrap.appendChild(h('div', {class:'qz-qnum'}, ['שאלה ' + (qi+1) + ' מתוך ' + QUESTIONS.length]));
+    const track = h('div', {class:'qz-progress-track'});
+    track.appendChild(h('div', {class:'qz-progress-fill', style:'width:' + Math.round((qi/QUESTIONS.length)*100) + '%;'}));
+    wrap.appendChild(track);
+    wrap.appendChild(h('div', {class:'qz-question-text qz-font-display'}, [q.q]));
+    const opts = h('div', {class:'qz-options'});
+    q.opts.forEach((o,i) => {
+      const optEl = h('div', {class:'qz-opt'}, [o]);
+      optEl.addEventListener('click', () => selectAnswer(i, q, qi, optEl));
+      opts.appendChild(optEl);
+    });
+    wrap.appendChild(opts);
+
+    state.questionStartAt = Date.now();
+    clearQTimer();
+    state.qTimer = setInterval(() => {
+      const elapsed = Date.now() - state.questionStartAt;
+      const remain = Math.max(0, QUESTION_SECONDS*1000 - elapsed);
+      const pct = remain / (QUESTION_SECONDS*1000);
+      const ringEl = root.querySelector('#qz-qtimer .qz-timer-fg');
+      const numEl = root.querySelector('#qz-qtimer-num');
+      if (ringEl){
+        ringEl.style.strokeDashoffset = circumference * (1-pct);
+        ringEl.classList.toggle('qz-timer-urgent', remain <= 2000);
+      }
+      if (numEl) numEl.textContent = Math.ceil(remain/1000);
+      if (remain <= 0 && !state.locked){
+        selectAnswer(-1, q, qi, null);
+      }
+    }, 100);
+
+    return wrap;
+  }
+
+  function selectAnswer(i, q, qi, optEl){
+    if (state.locked) return;
+    state.locked = true; state.selectedIdx = i;
+    clearQTimer();
+    const correct = i === q.correct;
+    if (correct) state.correctCount += 1;
+    root.querySelectorAll('.qz-opt').forEach(e => e.classList.add('qz-disabled'));
+    if (optEl) optEl.classList.add('qz-selected');
+
+    setTimeout(async () => {
+      const isLast = qi >= QUESTIONS.length - 1;
+      if (isLast){
+        const totalTimeMs = Date.now() - state.quizStartAt;
+        const finalRecord = { name: state.name, correctCount: state.correctCount, totalTimeMs, finished: true, joinedAt: state.quizStartAt };
+        await apiPost({ action: 'upsert', playerId: state.playerId, ...finalRecord });
+        state.totalTimeMs = totalTimeMs;
+        state.view = 'finish'; render();
+        const verified = await apiVerifyPlayer(state.playerId, { correctCount: state.correctCount, finished: true });
+        if (!verified && state.view === 'finish'){
+          state.saveFailed = true; render();
+        }
+      } else {
+        state.qIndex += 1; state.selectedIdx = null; state.locked = false;
+        await setPlayer(state.playerId, { name: state.name, correctCount: state.correctCount, totalTimeMs: 0, finished: false, joinedAt: state.quizStartAt });
+        state.view = 'question'; render();
+      }
+    }, FEEDBACK_MS);
+  }
+
+  // ---------- FINISH: completion alert + warm closing message ----------
+  function ScreenFinish(){
+    const wrap = h('div', {class:'qz-screen'});
+    const confettiBox = h('div', {class:'qz-confetti-container'});
+    wrap.appendChild(confettiBox);
+    wrap.appendChild(h('div', {class:'qz-alert-banner'}, ['🎉 סיימת את השאלון!']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:22px;'}, [esc(state.name) + ', תודה שהשתתפת']));
+    if (state.saveFailed){
+      wrap.appendChild(h('div', {class:'qz-warn-banner'}, ['⚠️ יש בעיה: ייתכן שהתוצאה שלך לא נשמרה. כדאי לספר למנחה ולנסות שוב אם אפשר.']));
+    }
+    wrap.appendChild(h('div', {class:'qz-final-msg', html:'מבטיחות שיהיה בסדר — כי נעשה שיהיה בסדר.<br>אוהבות, צוות פרודות | גרושות המילואימניקים 🩷'}));
+    spawnConfetti(confettiBox);
+    return wrap;
+  }
+
+  // ---------- HOST PIN GATE ----------
+  function ScreenHostPin(){
+    const wrap = h('div', {class:'qz-screen'});
+    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['גישת מנחה']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:20px;'}, ['הזיני את קוד המנחה']));
+    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['מסך זה מרכז את תשובות כל המשתתפות ומכריז על המנצחת — למנחה בלבד']));
+    const pinInput = h('input', {class:'qz-input', placeholder:'••••', maxlength:'6', type:'password', inputmode:'numeric'});
+    wrap.appendChild(pinInput);
+    const err = h('div', {class:'qz-error'});
+    wrap.appendChild(err);
+    wrap.appendChild(h('button', {class:'qz-btn', onclick: () => {
+      if (pinInput.value.trim() === HOST_PIN){ state.view='results'; render(); }
+      else { err.textContent = 'קוד שגוי'; }
+    }}, ['כניסה']));
+    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
+    setTimeout(() => pinInput.focus(), 50);
+    pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter'){
+      if (pinInput.value.trim() === HOST_PIN){ state.view='results'; render(); } else { err.textContent = 'קוד שגוי'; }
+    }});
+    return wrap;
+  }
+
+  // ---------- Hidden results view for the organizer (?view=results) ----------
+  function ScreenResults(){
+    const wrap = h('div', {class:'qz-screen'});
+    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['רשימת המשתתפות (למנחה)']));
+    const announceBox = h('div', {id:'qz-announce', style:'display:flex; flex-direction:column; align-items:center; gap:10px;'});
+    wrap.appendChild(announceBox);
+    const lb = h('div', {class:'qz-leaderboard', id:'qz-lb-list'});
+    wrap.appendChild(lb);
+    renderAnnounce(announceBox);
+    renderLeaderboardRows(lb);
+    const resetBtn = h('button', {class:'qz-reset-link'}, ['איפוס רשימת המשתתפות']);
+    let resetArmed = false;
+    resetBtn.addEventListener('click', async () => {
+      if (!resetArmed){
+        resetArmed = true;
+        resetBtn.textContent = 'בטוחה? לחצי שוב לאישור מחיקה';
+        setTimeout(() => { resetArmed = false; resetBtn.textContent = 'איפוס רשימת המשתתפות'; }, 4000);
+        return;
+      }
+      resetArmed = false;
+      resetBtn.textContent = 'מאפסת...';
+      await apiPost({ action: 'reset', pin: HOST_PIN });
+      state.players = []; render();
+    });
+    wrap.appendChild(resetBtn);
+    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
+    refreshResults();
+    setInterval(refreshResults, 2000);
+    return wrap;
+  }
+  function renderAnnounce(container){
+    container.innerHTML = '';
+    const winner = state.players.find(p => p.finished && p.correctCount > QUESTIONS.length/2);
+    if (winner){
+      container.appendChild(h('div', {class:'qz-winner-ring'}, ['🏆']));
+      container.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:24px;'}, [esc(winner.name)]));
+      container.appendChild(h('div', {class:'qz-subtitle'}, ['ענתה נכון על ' + winner.correctCount + ' מתוך ' + QUESTIONS.length + ' שאלות, בזמן ' + fmtTime(winner.totalTimeMs)]));
+    } else {
+      const stillPlaying = state.players.some(p => !p.finished);
+      container.appendChild(h('div', {class:'qz-subtitle'}, [stillPlaying ? 'עדיין יש משתתפות שממשיכות לענות...' : 'עדיין אין מי שענתה נכון על רוב השאלות']));
+    }
+  }
+  function renderLeaderboardRows(container){
+    container.innerHTML = '';
+    if (!state.players.length){ container.appendChild(h('div', {class:'qz-small'}, ['עדיין אין משתתפות ברשימה'])); return; }
+    state.players.forEach((p,i) => {
+      const isWinnerRow = i===0 && p.finished && p.correctCount > QUESTIONS.length/2;
+      const row = h('div', {class:'qz-lb-row' + (isWinnerRow ? ' qz-lb-first' : '')});
+      row.appendChild(h('div', {class:'qz-lb-rank'}, [String(i+1)]));
+      row.appendChild(h('div', {class:'qz-lb-name'}, [esc(p.name)]));
+      if (p.finished) row.appendChild(h('div', {class:'qz-lb-score'}, [p.correctCount + '/' + QUESTIONS.length + ' · ' + fmtTime(p.totalTimeMs)]));
+      else row.appendChild(h('div', {class:'qz-lb-progress'}, ['משחקת כעת...']));
+      container.appendChild(row);
+    });
+  }
+  async function refreshResults(){
+    if (state.view !== 'results') return;
+    const players = await getAllPlayers();
+    const changed = JSON.stringify(players) !== JSON.stringify(state.players);
+    state.players = players;
+    if (!changed) return;
+    const lb = root.querySelector('#qz-lb-list');
+    if (lb) renderLeaderboardRows(lb);
+    const announceBox = root.querySelector('#qz-announce');
+    if (announceBox) renderAnnounce(announceBox);
+  }
+
+  const SCREENS = { 'landing': ScreenLanding, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
+
+  function getUrlParam(name){
+    try {
+      const v = new URLSearchParams(window.location.search).get(name);
+      if (v) return v;
+    } catch(e){}
+    try {
+      const ref = document.referrer;
+      if (ref){
+        const v2 = new URL(ref).searchParams.get(name);
+        if (v2) return v2;
+      }
+    } catch(e){}
+    return null;
+  }
+
+  if (getUrlParam('view') === 'results') state.view = 'host-pin';
+
+  render();
+})();
+</script>
