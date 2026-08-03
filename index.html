@@ -216,7 +216,7 @@
 
   function fetchTimeout(url, options, ms){
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), ms || 6000);
+    const timer = setTimeout(() => controller.abort(), ms || 3000);
     return fetch(url, Object.assign({}, options, { signal: controller.signal })).finally(() => clearTimeout(timer));
   }
 
@@ -232,7 +232,7 @@
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
-      }, 6000);
+      }, 3000);
       return true;
     } catch(e){ return false; }
   }
@@ -254,7 +254,7 @@
   async function apiGetPlayers(){
     if (!sheetsConfigured()) return [];
     try {
-      const res = await fetchTimeout(SHEETS_URL + '?t=' + Date.now(), {}, 6000);
+      const res = await fetchTimeout(SHEETS_URL + '?t=' + Date.now(), {}, 3000);
       const data = await res.json();
       return (data && data.players) ? data.players : [];
     } catch(e){ return []; }
@@ -396,7 +396,10 @@
 
     state.questionStartAt = Date.now();
     clearQTimer();
+    state.qTimerEpoch = (state.qTimerEpoch || 0) + 1;
+    const myEpoch = state.qTimerEpoch;
     state.qTimer = setInterval(() => {
+      if (state.qTimerEpoch !== myEpoch){ clearInterval(state.qTimer); return; }
       const elapsed = Date.now() - state.questionStartAt;
       const remain = Math.max(0, QUESTION_SECONDS*1000 - elapsed);
       const pct = remain / (QUESTION_SECONDS*1000);
@@ -416,6 +419,7 @@
   }
 
   function selectAnswer(i, q, qi, optEl){
+    if (qi !== state.qIndex) return;
     if (state.locked) return;
     state.locked = true; state.selectedIdx = i;
     clearQTimer();
