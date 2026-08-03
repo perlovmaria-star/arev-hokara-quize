@@ -254,10 +254,10 @@
   async function apiGetPlayers(){
     if (!sheetsConfigured()) return [];
     try {
-      const res = await fetchTimeout(SHEETS_URL + '?t=' + Date.now(), {}, 3000);
+      const res = await fetchTimeout(SHEETS_URL + '?t=' + Date.now(), {}, 5000);
       const data = await res.json();
       return (data && data.players) ? data.players : [];
-    } catch(e){ return []; }
+    } catch(e){ return null; }
   }
 
   async function setPlayer(pid, data){
@@ -266,6 +266,7 @@
 
   async function getAllPlayers(){
     const raw = await apiGetPlayers();
+    if (raw === null) return null;
     const out = raw.map(p => ({
       name: p.name,
       correctCount: Number(p.correctCount) || 0,
@@ -543,6 +544,7 @@
   async function refreshResults(){
     if (state.view !== 'results') return;
     const players = await getAllPlayers();
+    if (players === null) return; // fetch failed/timed out — keep showing the last known list
     const changed = JSON.stringify(players) !== JSON.stringify(state.players);
     state.players = players;
     if (!changed) return;
