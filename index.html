@@ -214,6 +214,12 @@
 
   function sheetsConfigured(){ return /^https:\/\//.test(SHEETS_URL); }
 
+  function fetchTimeout(url, options, ms){
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms || 6000);
+    return fetch(url, Object.assign({}, options, { signal: controller.signal })).finally(() => clearTimeout(timer));
+  }
+
   async function apiPost(payload){
     if (!sheetsConfigured()) return false;
     try {
@@ -221,12 +227,12 @@
       // often can't read due to CORS, even when the write itself succeeds.
       // Fire the write with no-cors (can't read the response) and verify
       // success separately via a GET re-fetch.
-      await fetch(SHEETS_URL, {
+      await fetchTimeout(SHEETS_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
-      });
+      }, 6000);
       return true;
     } catch(e){ return false; }
   }
@@ -248,7 +254,7 @@
   async function apiGetPlayers(){
     if (!sheetsConfigured()) return [];
     try {
-      const res = await fetch(SHEETS_URL + '?t=' + Date.now());
+      const res = await fetchTimeout(SHEETS_URL + '?t=' + Date.now(), {}, 6000);
       const data = await res.json();
       return (data && data.players) ? data.players : [];
     } catch(e){ return []; }
@@ -355,11 +361,11 @@
       const name = nameInput.value.trim();
       if (!name){ err.textContent = 'נא להזין שם'; return; }
       const pid = uid();
-      await setPlayer(pid, { name, correctCount: 0, totalTimeMs: 0, finished: false, joinedAt: Date.now() });
       state.playerId = pid; state.name = name;
       state.qIndex = 0; state.correctCount = 0; state.selectedIdx = null; state.locked = false;
       state.quizStartAt = Date.now();
       state.view = 'question'; render();
+      setPlayer(pid, { name, correctCount: 0, totalTimeMs: 0, finished: false, joinedAt: Date.now() });
     }}, ['התחילי לשחק']));
     wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
     setTimeout(() => nameInput.focus(), 50);
@@ -418,22 +424,22 @@
     root.querySelectorAll('.qz-opt').forEach(e => e.classList.add('qz-disabled'));
     if (optEl) optEl.classList.add('qz-selected');
 
-    setTimeout(async () => {
+    setTimeout(() => {
       const isLast = qi >= QUESTIONS.length - 1;
       if (isLast){
         const totalTimeMs = Date.now() - state.quizStartAt;
         const finalRecord = { name: state.name, correctCount: state.correctCount, totalTimeMs, finished: true, joinedAt: state.quizStartAt };
-        await apiPost({ action: 'upsert', playerId: state.playerId, ...finalRecord });
         state.totalTimeMs = totalTimeMs;
         state.view = 'finish'; render();
-        const verified = await apiVerifyPlayer(state.playerId, { correctCount: state.correctCount, finished: true });
-        if (!verified && state.view === 'finish'){
-          state.saveFailed = true; render();
-        }
+        apiPost({ action: 'upsert', playerId: state.playerId, ...finalRecord }).then(() => {
+          apiVerifyPlayer(state.playerId, { correctCount: state.correctCount, finished: true }).then(verified => {
+            if (!verified && state.view === 'finish'){ state.saveFailed = true; render(); }
+          });
+        });
       } else {
         state.qIndex += 1; state.selectedIdx = null; state.locked = false;
-        await setPlayer(state.playerId, { name: state.name, correctCount: state.correctCount, totalTimeMs: 0, finished: false, joinedAt: state.quizStartAt });
         state.view = 'question'; render();
+        setPlayer(state.playerId, { name: state.name, correctCount: state.correctCount, totalTimeMs: 0, finished: false, joinedAt: state.quizStartAt });
       }
     }, FEEDBACK_MS);
   }
