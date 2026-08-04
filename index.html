@@ -92,6 +92,26 @@
     text-shadow: 0 2px 18px rgba(240,168,196,0.35);
   }
   #quiz-root .qz-subtitle { color: var(--muted); font-size: 14.5px; max-width: 420px; }
+  #quiz-root .qz-welcome-headline { font-size: 54px; line-height: 1.05; color: #fff; text-shadow: 0 3px 14px rgba(0,0,0,0.5); }
+  #quiz-root .qz-welcome-badge {
+    font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 15px; color: var(--gold);
+    background: rgba(58,29,71,0.85); border: 1.5px solid rgba(201,160,220,0.5);
+    border-radius: 12px; padding: 10px 20px; margin-top: 10px;
+  }
+  #quiz-root .qz-btn-outline-gold {
+    font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
+    padding: 13px 34px; border-radius: 100px; cursor: pointer;
+    background: rgba(36,17,41,0.55); border: 2px solid var(--gold); color: var(--gold);
+    transition: transform .15s ease, background .15s ease;
+  }
+  #quiz-root .qz-btn-outline-gold:hover { transform: translateY(-2px); background: rgba(36,17,41,0.8); }
+  #quiz-root .qz-btn-plain-white {
+    font-family: 'Assistant', sans-serif; font-weight: 400; font-size: 16px;
+    padding: 10px 26px; border-radius: 100px; cursor: pointer;
+    background: transparent; border: none; color: var(--cream);
+    opacity: 0.85; transition: opacity .15s ease;
+  }
+  #quiz-root .qz-btn-plain-white:hover { opacity: 1; }
   #quiz-root .qz-btn {
     font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
     padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer;
@@ -222,6 +242,7 @@
     #quiz-root .qz-options { grid-template-columns: 1fr; }
     #quiz-root .qz-question-text { font-size: 20px; }
     #quiz-root .qz-timer-mid { width: 66px; height: 66px; }
+    #quiz-root .qz-welcome-headline { font-size: 44px; }
     #quiz-root { margin: 0; border-radius: 0; box-shadow: none; max-width: 100%; }
     #quiz-root .qz-presenter-text { font-size: 22px; }
     #quiz-root .qz-presenter-opts { grid-template-columns: 1fr; }
@@ -381,13 +402,13 @@
   // ---------- SCREEN 0: WELCOME (forum logo + event welcome) ----------
   function ScreenWelcome(){
     const wrap = h('div', {class:'qz-screen'});
-    wrap.appendChild(h('img', {src:'./Forumlogo.png', alt:'פורום נשות המילואימניקים', style:'width:150px; height:150px; border-radius:50%; box-shadow:0 8px 30px rgba(0,0,0,0.35);'}));
+    wrap.appendChild(h('img', {src:'./Forumlogo.png', alt:'פורום נשות המילואימניקים', style:'width:72px; height:72px; border-radius:50%; box-shadow:0 6px 20px rgba(0,0,0,0.3); margin-bottom:2px;'}));
     wrap.appendChild(h('div', {class:'qz-eyebrow', style:'color: var(--gold);'}, ['ברוכה הבאה']));
-    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['ערב הוקרה']));
-    wrap.appendChild(h('div', {style:'margin-top:14px;'}));
-    wrap.appendChild(h('div', {class:'qz-eyebrow', style:'color: var(--cream); text-transform:none; letter-spacing:normal; font-size:14px;'}, ['עבור']));
-    wrap.appendChild(h('div', {class:'qz-subtitle', style:'color: var(--cream);'}, ['פרודות | גרושות המילואימניקים']));
-    wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='qr'; render(); }}, ['המשך']));
+    wrap.appendChild(h('div', {class:'qz-welcome-headline qz-font-display'}, ['ערב']));
+    wrap.appendChild(h('div', {class:'qz-welcome-headline qz-font-display', style:'margin-top:-10px;'}, ['הוקרה']));
+    wrap.appendChild(h('div', {class:'qz-font-display', style:'color: var(--cream); font-size:18px; margin-top:8px;'}, ['עבור']));
+    wrap.appendChild(h('div', {class:'qz-welcome-badge', style:'margin-top:-10px;'}, ['פרודות | גרושות המילואימניקים']));
+    wrap.appendChild(h('button', {class:'qz-btn-plain-white', onclick: () => { state.view='qr'; render(); }}, ['מתחילים']));
     return wrap;
   }
 
