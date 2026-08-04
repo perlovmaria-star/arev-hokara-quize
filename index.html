@@ -1,3 +1,25 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>מי באמת מבינה את החיים שלנו?</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(240,168,196,0.18), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(232,184,75,0.12), transparent 40%),
+      linear-gradient(160deg, #241129 0%, #341a3d 55%, #2c1533 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
 <div id="quiz-root" dir="rtl" lang="he"></div>
 <style>
   #quiz-root {
@@ -13,22 +35,17 @@
     font-family: 'Assistant', 'Heebo', sans-serif;
     position: relative;
     width: 100%;
-    min-height: 640px;
-    background:
-      radial-gradient(circle at 20% 15%, rgba(240,168,196,0.18), transparent 45%),
-      radial-gradient(circle at 85% 80%, rgba(232,184,75,0.12), transparent 40%),
-      linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-deep2) 55%, #2c1533 100%);
+    min-height: 100dvh;
+    background: transparent;
     color: var(--cream);
-    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
   }
   #quiz-root * { box-sizing: border-box; }
   #quiz-root .qz-font-display { font-family: 'Heebo', sans-serif; font-weight: 900; }
   #quiz-root .qz-screen {
     position: relative;
     padding: 34px 26px 26px;
-    min-height: 640px;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -84,6 +101,15 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.35); border: 3px solid var(--gold);
   }
   #quiz-root .qz-qr-hint { font-size: 12.5px; color: var(--muted); max-width: 300px; }
+  #quiz-root .qz-presenter-qnum { font-size: 16px; color: var(--pink); letter-spacing: 1px; font-weight: 700; }
+  #quiz-root .qz-presenter-text { font-size: 34px; max-width: 700px; line-height: 1.4; margin: 10px 0 18px; }
+  #quiz-root .qz-presenter-opts { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; width:100%; max-width: 720px; }
+  #quiz-root .qz-presenter-opt {
+    font-size: 20px; font-weight: 600; padding: 22px 18px; border-radius: 18px;
+    border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06);
+    text-align:center; min-height: 80px; display:flex; align-items:center; justify-content:center;
+  }
+  #quiz-root .qz-presenter-nav { display:flex; gap:14px; margin-top: 26px; }
   #quiz-root .qz-error { color: var(--pink); font-size: 14px; min-height: 18px; }
   #quiz-root .qz-qnum { color: var(--muted); font-size: 13.5px; letter-spacing: 1px; }
   #quiz-root .qz-progress-track { width:100%; max-width:420px; height:6px; background: rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; }
@@ -176,10 +202,15 @@
     #quiz-root .qz-options { grid-template-columns: 1fr; }
     #quiz-root .qz-question-text { font-size: 20px; }
     #quiz-root .qz-timer-mid { width: 66px; height: 66px; }
+    #quiz-root { margin: 0; border-radius: 0; box-shadow: none; max-width: 100%; }
+    #quiz-root .qz-presenter-text { font-size: 22px; }
+    #quiz-root .qz-presenter-opts { grid-template-columns: 1fr; }
+    #quiz-root .qz-presenter-opt { font-size: 16px; padding: 16px; }
   }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 (function(){
   const QUESTIONS = [
@@ -190,7 +221,6 @@
     { q: 'כמה פעמים אמרת השבוע "עזבי, אני אעשה את זה לבד"?', opts: ["פעם.","כמה פעמים.","כמעט כל יום.","זו כבר לא אמירה. זו תוכנית עבודה."], correct: 3 },
     { q: 'כמה פעמים שמעת את המשפט "אבל אתם כבר גרושים..."?', opts: ["פעם אחת.","כמה פעמים.","יותר מדי פעמים.","אם הייתי מקבלת שקל על כל פעם, לא הייתי צריכה קרן סיוע."], correct: 3 },
     { q: 'כמה פעמים הסברת למישהו מה זה בכלל "גרושה של מילואימניק"?', opts: ["פעם אחת.","כמה פעמים.","איבדתי ספירה.","אני כבר יכולה להעביר על זה הרצאה."], correct: 3 },
-    { q: "מה הכי מרגש אותך לקבל?", opts: ["יום בלי כביסות.","קפה חם.","קרם גוף.","הודעה מהבנק: \"הופקדה העברה\"."], correct: 3 },
     { q: 'כמה פעמים אמרת השנה "אין לי כוח"?', opts: ["פעם-פעמיים.","פעם בשבוע.","כמעט כל יום.","זו כבר לא תחושה. זו זהות."], correct: 3 },
     { q: "כמה פעמים פתחת את הטלפון כדי לבדוק אם נכנס כסף?", opts: ["פעם ביום.","כמה פעמים ביום.","כל פעם שיש התראה.","אני כבר יודעת לזהות את האפליקציה לפי הצליל."], correct: 3 },
     { q: "מה הסיכוי שהדר מרקס תצא מהערב הזה עם עוד חומר למופע?", opts: ["נמוך","בינוני","גבוה","אנחנו מופע שלם."], correct: 3 },
@@ -203,9 +233,9 @@
   const FEEDBACK_MS = 700;
   const root = document.getElementById('quiz-root');
   let state = {
-    view: 'landing', name: '', playerId: '',
+    view: 'qr', name: '', playerId: '',
     qIndex: 0, correctCount: 0, quizStartAt: 0, questionStartAt: 0, selectedIdx: null, locked: false,
-    qTimer: null, players: []
+    qTimer: null, players: [], presenterIndex: 0
   };
 
   function uid(){ return 'p' + Math.random().toString(36).slice(2,10); }
@@ -283,7 +313,7 @@
     return out;
   }
 
-  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.landing(); root.appendChild(el); }
+  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.qr(); root.appendChild(el); }
   function h(tag, attrs, children){
     const el = document.createElement(tag);
     if (attrs) for (const k in attrs){
@@ -327,18 +357,35 @@
   }
 
   // ---------- LANDING: game explanation (no QR here — QR lives in a separate slide) ----------
-  function ScreenLanding(){
+  // ---------- SCREEN 1: QR ----------
+  function ScreenQR(){
     const wrap = h('div', {class:'qz-screen'});
     wrap.appendChild(h('div', {class:'qz-ring-wrap'}, [
       h('div', {class:'qz-ring-glow'}),
       h('div', {class:'qz-font-display qz-heartbeat', style:'font-size:42px; z-index:1;'}, ['🩷'])
     ]));
+    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['משחק פתיחה קהילתי']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['מי באמת מבינה את החיים שלנו?']));
+
+    const qrBox = h('div', {class:'qz-qr-box', id:'qz-qr-box'});
+    wrap.appendChild(qrBox);
+    wrap.appendChild(h('div', {class:'qz-qr-hint'}, ['📱 סרקו כדי להצטרף למשחק מהטלפון שלכן']));
+    setTimeout(drawQr, 0);
+
+    wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='start'; render(); }}, ['הבאה →']));
+    return wrap;
+  }
+
+  // ---------- SCREEN 2: START OF THE GAME ----------
+  function ScreenStart(){
+    const wrap = h('div', {class:'qz-screen'});
     wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['לפני שמתחילים']));
     wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['מי באמת מבינה את החיים שלנו?']));
-    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ענו על 12 שאלות ותיהיו מנצחות הערב']));
+    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ענו על 11 שאלות ותיהיו מנצחות הערב']));
     wrap.appendChild(h('div', {class:'qz-timing-card'}, ['לכל שאלה יש 20 שניות בדיוק לענות. אם הזמן נגמר בלי בחירה, המשחק ממשיך אוטומטית לשאלה הבאה.']));
     wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='name'; render(); }}, ['בואי נתחיל']));
-    wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.view='host-pin'; render(); }}, ['כניסת מנחה']));
+    wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.presenterIndex = 0; state.view='presenter'; render(); }}, ['🎤 מצב מנחה — הקראת שאלות']));
+    wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.view='host-pin'; render(); }}, ['כניסת מנחה — תוצאות']));
     const warnBox = h('div', {id:'qz-storage-warn'});
     wrap.appendChild(warnBox);
     checkStorageHealth().then(ok => {
@@ -349,11 +396,57 @@
     return wrap;
   }
 
+  function drawQr(){
+    const box = root.querySelector('#qz-qr-box');
+    if (!box || typeof QRCode === 'undefined') return;
+    box.innerHTML = '';
+    const full = window.location.href.split('?')[0] + '?join=1';
+    try {
+      new QRCode(box, { text: full, width: 170, height: 170, colorDark: '#241129', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    } catch(e){}
+  }
+
+  // ---------- PRESENTER MODE (host's shared screen — reads questions aloud, no scoring/timer) ----------
+  function ScreenPresenter(){
+    const wrap = h('div', {class:'qz-screen'});
+    const idx = state.presenterIndex || 0;
+
+    if (idx === 0){
+      wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['מצב מנחה']));
+      wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['מוכנות?']));
+      wrap.appendChild(h('div', {class:'qz-subtitle'}, ['כל אחת עונה בטלפון שלה. את מקריאה כאן את השאלות לקהל.']));
+    } else if (idx <= QUESTIONS.length){
+      const q = QUESTIONS[idx-1];
+      wrap.appendChild(h('div', {class:'qz-presenter-qnum'}, ['שאלה ' + idx + ' מתוך ' + QUESTIONS.length]));
+      wrap.appendChild(h('div', {class:'qz-presenter-text qz-font-display'}, [q.q]));
+      const opts = h('div', {class:'qz-presenter-opts'});
+      q.opts.forEach(o => opts.appendChild(h('div', {class:'qz-presenter-opt'}, [o])));
+      wrap.appendChild(opts);
+    } else {
+      wrap.appendChild(h('div', {style:'font-size:44px;'}, ['🩷']));
+      wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['זהו, סיימנו!']));
+      wrap.appendChild(h('div', {class:'qz-subtitle'}, ['עוברות ללוח התוצאות כדי להכריז על המנצחת']));
+    }
+
+    const nav = h('div', {class:'qz-presenter-nav'});
+    if (idx > 0){
+      nav.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.presenterIndex -= 1; render(); }}, ['← הקודמת']));
+    }
+    if (idx <= QUESTIONS.length){
+      nav.appendChild(h('button', {class:'qz-btn', onclick: () => { state.presenterIndex = idx + 1; render(); }}, ['הבאה →']));
+    } else {
+      nav.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='host-pin'; render(); }}, ['🏆 ללוח התוצאות']));
+    }
+    wrap.appendChild(nav);
+    wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.view='start'; render(); }}, ['יציאה ממצב מנחה']));
+    return wrap;
+  }
+
   // ---------- NAME ENTRY ----------
   function ScreenName(){
     const wrap = h('div', {class:'qz-screen'});
     wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['הצטרפות למשחק']));
-    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:22px;'}, ['מה השם המלא שלך?']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:22px;'}, ['מה שמך המלא?']));
     const nameInput = h('input', {class:'qz-input', placeholder:'שם מלא'});
     wrap.appendChild(nameInput);
     const err = h('div', {class:'qz-error'});
@@ -368,7 +461,7 @@
       state.view = 'question'; render();
       setPlayer(pid, { name, correctCount: 0, totalTimeMs: 0, finished: false, joinedAt: Date.now() });
     }}, ['התחילי לשחק']));
-    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
+    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='start'; render(); }}, ['⬅ חזרה']));
     setTimeout(() => nameInput.focus(), 50);
     return wrap;
   }
@@ -478,7 +571,7 @@
       if (pinInput.value.trim() === HOST_PIN){ state.view='results'; render(); }
       else { err.textContent = 'קוד שגוי'; }
     }}, ['כניסה']));
-    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
+    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='start'; render(); }}, ['⬅ חזרה']));
     setTimeout(() => pinInput.focus(), 50);
     pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter'){
       if (pinInput.value.trim() === HOST_PIN){ state.view='results'; render(); } else { err.textContent = 'קוד שגוי'; }
@@ -511,7 +604,7 @@
       state.players = []; render();
     });
     wrap.appendChild(resetBtn);
-    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='landing'; render(); }}, ['⬅ חזרה']));
+    wrap.appendChild(h('button', {class:'qz-btn qz-secondary', onclick: () => { state.view='start'; render(); }}, ['⬅ חזרה']));
     refreshResults();
     setInterval(refreshResults, 2000);
     return wrap;
@@ -554,7 +647,7 @@
     if (announceBox) renderAnnounce(announceBox);
   }
 
-  const SCREENS = { 'landing': ScreenLanding, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
+  const SCREENS = { 'qr': ScreenQR, 'start': ScreenStart, 'presenter': ScreenPresenter, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
 
   function getUrlParam(name){
     try {
@@ -572,7 +665,11 @@
   }
 
   if (getUrlParam('view') === 'results') state.view = 'host-pin';
+  else if (getUrlParam('join') === '1') state.view = 'name';
 
   render();
 })();
 </script>
+
+</body>
+</html>
