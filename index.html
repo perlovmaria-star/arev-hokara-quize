@@ -92,9 +92,9 @@
     text-shadow: 0 2px 18px rgba(240,168,196,0.35);
   }
   #quiz-root .qz-subtitle { color: var(--muted); font-size: 14.5px; max-width: 420px; }
-  #quiz-root .qz-welcome-headline { font-size: 54px; line-height: 1.05; color: #fff; text-shadow: 0 3px 14px rgba(0,0,0,0.5); }
+  #quiz-root .qz-welcome-headline { font-size: 63px; line-height: 1.1; color: #fff; text-shadow: 0 3px 14px rgba(0,0,0,0.5); }
   #quiz-root .qz-welcome-badge {
-    font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 15px; color: var(--gold);
+    font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 22px; color: var(--gold);
     background: rgba(58,29,71,0.85); border: 1.5px solid rgba(201,160,220,0.5);
     border-radius: 12px; padding: 10px 20px; margin-top: 10px;
   }
@@ -106,7 +106,7 @@
   }
   #quiz-root .qz-btn-outline-gold:hover { transform: translateY(-2px); background: rgba(36,17,41,0.8); }
   #quiz-root .qz-btn-plain-white {
-    font-family: 'Assistant', sans-serif; font-weight: 400; font-size: 16px;
+    font-family: 'Assistant', sans-serif; font-weight: 400; font-size: 24px;
     padding: 10px 26px; border-radius: 100px; cursor: pointer;
     background: transparent; border: none; color: var(--cream);
     opacity: 0.85; transition: opacity .15s ease;
@@ -251,7 +251,7 @@
     #quiz-root .qz-options { grid-template-columns: 1fr; }
     #quiz-root .qz-question-text { font-size: 20px; }
     #quiz-root .qz-timer-mid { width: 66px; height: 66px; }
-    #quiz-root .qz-welcome-headline { font-size: 44px; }
+    #quiz-root .qz-welcome-headline { font-size: 48px; }
     #quiz-root { margin: 0; border-radius: 0; box-shadow: none; max-width: 100%; }
     #quiz-root .qz-presenter-text { font-size: 22px; }
     #quiz-root .qz-presenter-opts { grid-template-columns: 1fr; }
@@ -271,14 +271,11 @@
     { q: 'כמה פעמים אמרת השבוע "עזבי, אני אעשה את זה לבד"?', opts: ["פעם","כמה פעמים","כמעט כל יום","זו כבר לא אמירה. זו תוכנית עבודה"], correct: 3 },
     { q: 'כמה פעמים שמעת את המשפט "אבל אתם כבר גרושים..."?', opts: ["פעם אחת","כמה פעמים","יותר מדי פעמים","אם הייתי מקבלת שקל על כל פעם, לא הייתי צריכה קרן סיוע"], correct: 3 },
     { q: 'כמה פעמים הסברת למישהו מה זה בכלל "גרושה של מילואימניק"?', opts: ["פעם אחת","כמה פעמים","איבדתי ספירה","אני כבר יכולה להעביר על זה הרצאה"], correct: 3 },
-    { q: "מה הכי מרגש אותך לקבל?", opts: ["יום בלי כביסות","קפה חם","קרם גוף","הודעה מהבנק: \"הופקדה העברה\""], correct: 3 },
     { q: 'כמה פעמים אמרת השנה "אין לי כוח"?', opts: ["פעם-פעמיים","פעם בשבוע","כמעט כל יום","זו כבר לא תחושה. זו זהות"], correct: 3 },
     { q: "כמה פעמים פתחת את הטלפון כדי לבדוק אם נכנס כסף?", opts: ["פעם ביום","כמה פעמים ביום","כל פעם שיש התראה","אני כבר יודעת לזהות את האפליקציה לפי הצליל"], correct: 3 },
     { q: "מה הכי מלחיץ אותך?", opts: ["הטלפון מהגן","הודעה מבית הספר","הודעה מהבנק","שלוש נקודות בוואטסאפ מגרושך..."], correct: 3 },
     { q: "מה הדבר הראשון שאת עושה כשמתפנה לך שעה?", opts: ["ישנה","מקפלת כביסה","משלימה סידורים","מבזבזת רבע שעה על להחליט במה להתחיל"], correct: 3 },
     { q: 'כמה פעמים אמרת "יהיה בסדר" כשלא היה לך מושג איך יהיה?', opts: ["פעם","כמה פעמים","כל שבוע","זו תוכנית העבודה שלי מאז 7 באוקטובר"], correct: 3 },
-    { q: "מה הסיכוי שהדר מרקס תצא מהערב הזה עם עוד חומר למופע?", opts: ["נמוך","בינוני","גבוה","אנחנו מופע שלם"], correct: 3 },
-    { q: "מה הדבר הראשון שהדר תעשה כשתגיע הביתה?", opts: ["תספר על הערב לבן הזוג שלה","תכתוב רעיונות","תתקשר לסוכנת","תבדוק שאנחנו לא דורשות תמלוגים 😂"], correct: 3 },
   ];
   const HOST_PIN = '2026';
   // Paste the Google Apps Script Web App URL here after deploying it (see deployment instructions):
@@ -416,10 +413,8 @@
   function ScreenWelcome(){
     const wrap = h('div', {class:'qz-screen'});
     wrap.appendChild(h('img', {src:'./Forumlogo.png', alt:'פורום נשות המילואימניקים', style:'width:72px; height:72px; border-radius:50%; box-shadow:0 6px 20px rgba(0,0,0,0.3); margin-bottom:2px;'}));
-    wrap.appendChild(h('div', {style:'color: var(--gold); font-family:"Assistant",sans-serif; font-weight:600; font-size:15px; letter-spacing:0.3px;'}, ['ברוכה הבאה']));
-    wrap.appendChild(h('div', {class:'qz-welcome-headline qz-font-display', style:'margin-top:-4px;'}, ['ערב']));
-    wrap.appendChild(h('div', {class:'qz-welcome-headline qz-font-display', style:'margin-top:-24px;'}, ['הוקרה']));
-    wrap.appendChild(h('div', {style:'color: var(--cream); font-family:"Assistant",sans-serif; font-weight:300; font-size:17px; margin-top:-6px;'}, ['עבור']));
+    wrap.appendChild(h('div', {class:'qz-welcome-headline qz-font-display'}, ['ערב הוקרה']));
+    wrap.appendChild(h('div', {style:'color: var(--cream); font-family:"Assistant",sans-serif; font-weight:300; font-size:26px; margin-top:-6px;'}, ['עבור']));
     wrap.appendChild(h('div', {class:'qz-welcome-badge', style:'margin-top:-10px;'}, ['פרודות | גרושות המילואימניקים']));
     wrap.appendChild(h('button', {class:'qz-btn-plain-white', onclick: () => { state.view='qr'; render(); }}, ['מתחילים']));
     return wrap;
