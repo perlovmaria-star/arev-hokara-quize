@@ -382,8 +382,11 @@
   function ScreenWelcome(){
     const wrap = h('div', {class:'qz-screen'});
     wrap.appendChild(h('img', {src:'./Forumlogo.png', alt:'פורום נשות המילואימניקים', style:'width:150px; height:150px; border-radius:50%; box-shadow:0 8px 30px rgba(0,0,0,0.35);'}));
-    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['ברוכה הבאה לאירוע']));
-    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ערב הוקרה עבור פרודות | גרושות — אמאות לילדי המילואימניקים']));
+    wrap.appendChild(h('div', {class:'qz-eyebrow', style:'color: var(--gold);'}, ['ברוכה הבאה']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['ערב הוקרה']));
+    wrap.appendChild(h('div', {style:'margin-top:14px;'}));
+    wrap.appendChild(h('div', {class:'qz-eyebrow', style:'color: var(--cream); text-transform:none; letter-spacing:normal; font-size:14px;'}, ['עבור']));
+    wrap.appendChild(h('div', {class:'qz-subtitle', style:'color: var(--cream);'}, ['פרודות | גרושות המילואימניקים']));
     wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='qr'; render(); }}, ['המשך']));
     return wrap;
   }
