@@ -5,13 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>מי באמת מבינה את החיים שלנו?</title>
 <style>
+  @font-face {
+    font-family: 'FbSemitrayler';
+    src: url('./fonts/FbSemitrayler-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'FbSemitrayler';
+    src: url('./fonts/FbSemitrayler-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'FbSemitrayler';
+    src: url('./fonts/FbSemitrayler-Black.otf') format('opentype');
+    font-weight: 900;
+    font-display: swap;
+  }
   html, body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
     background:
       radial-gradient(circle at 20% 15%, rgba(240,168,196,0.18), transparent 45%),
-      radial-gradient(circle at 85% 80%, rgba(232,184,75,0.12), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(255,234,165,0.12), transparent 40%),
       linear-gradient(160deg, #3a1d47 0%, #4a2456 55%, #3f1f49 100%);
   }
 </style>
@@ -26,7 +44,7 @@
     --purple-dark: #5a2a63;
     --lavender: #c9a0dc;
     --pink: #f0a8c4;
-    --gold: #e8b84b;
+    --gold: #FFEAA5;
     --cream: #fbf3fa;
     --muted: #cbb3d1;
     font-family: 'Assistant', 'Heebo', sans-serif;
@@ -39,7 +57,7 @@
     color: var(--cream);
   }
   #quiz-root * { box-sizing: border-box; }
-  #quiz-root .qz-font-display { font-family: 'Heebo', sans-serif; font-weight: 900; }
+  #quiz-root .qz-font-display { font-family: 'FbSemitrayler', 'Heebo', sans-serif; font-weight: 900; }
   #quiz-root .qz-screen {
     position: relative;
     padding: 34px 26px 26px;
@@ -77,11 +95,11 @@
   #quiz-root .qz-btn {
     font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
     padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer;
-    background: var(--purple);
-    color: #fff; box-shadow: 0 8px 24px rgba(122,59,130,0.45);
+    background: var(--gold);
+    color: #2c1533; box-shadow: 0 8px 24px rgba(255,234,165,0.4);
     transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
   }
-  #quiz-root .qz-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(122,59,130,0.6); background: var(--purple-dark); }
+  #quiz-root .qz-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,234,165,0.55); background: #FFDD7A; }
   #quiz-root .qz-btn:active { transform: translateY(0); }
   #quiz-root .qz-btn.qz-secondary {
     background: transparent; border: 1.5px solid var(--lavender); color: var(--lavender); box-shadow:none;
@@ -127,7 +145,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   #quiz-root .qz-opt:hover { border-color: var(--pink); background: rgba(240,168,196,0.12); transform: translateY(-2px); }
-  #quiz-root .qz-opt.qz-selected { border-color: var(--gold); background: rgba(232,184,75,0.18); }
+  #quiz-root .qz-opt.qz-selected { border-color: var(--gold); background: rgba(255,234,165,0.18); }
   #quiz-root .qz-opt.qz-correct { border-color: #7fd68a; background: rgba(127,214,138,0.22); }
   #quiz-root .qz-opt.qz-wrong { border-color: #e08a8a; background: rgba(224,138,138,0.18); opacity:.7; }
   #quiz-root .qz-opt.qz-disabled { pointer-events:none; }
@@ -143,7 +161,7 @@
   }
   #quiz-root .qz-winner-ring {
     width: 120px; height:120px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    background: radial-gradient(circle, rgba(232,184,75,0.35), transparent 70%);
+    background: radial-gradient(circle, rgba(255,234,165,0.35), transparent 70%);
     animation: qz-pulse 2.2s ease-in-out infinite;
     font-size: 44px;
   }
@@ -151,7 +169,7 @@
     font-family: 'Heebo', sans-serif; font-weight: 800; font-size: 17px;
     background: linear-gradient(135deg, var(--gold), var(--pink));
     color: #241129; padding: 12px 26px; border-radius: 100px;
-    box-shadow: 0 8px 24px rgba(232,184,75,0.35);
+    box-shadow: 0 8px 24px rgba(255,234,165,0.35);
     animation: qz-fade-in .5s ease;
   }
   #quiz-root .qz-final-msg {
@@ -165,7 +183,7 @@
     display:flex; align-items:center; justify-content:space-between; padding: 11px 18px;
     border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,160,220,0.2);
   }
-  #quiz-root .qz-lb-row.qz-lb-first { border-color: var(--gold); background: rgba(232,184,75,0.15); }
+  #quiz-root .qz-lb-row.qz-lb-first { border-color: var(--gold); background: rgba(255,234,165,0.15); }
   #quiz-root .qz-lb-rank { font-family:'Heebo'; font-weight:900; color: var(--pink); width: 26px; flex-shrink:0; }
   #quiz-root .qz-lb-name { flex:1; text-align: right; margin-right: 10px; font-weight:600; font-size:14px; }
   #quiz-root .qz-lb-score { font-family:'Heebo'; font-weight:800; color: var(--gold); font-size:14px; flex-shrink:0; }
@@ -189,7 +207,7 @@
   }
   #quiz-root .qz-timing-card {
     max-width: 420px; font-size: 19px; font-weight: 700; line-height: 1.6; color: var(--cream); text-align: center;
-    background: linear-gradient(135deg, rgba(232,184,75,0.22), rgba(240,168,196,0.18));
+    background: linear-gradient(135deg, rgba(255,234,165,0.22), rgba(240,168,196,0.18));
     border: 1.5px solid var(--gold);
     border-radius: 20px; padding: 26px 24px;
   }
@@ -235,7 +253,7 @@
   const FEEDBACK_MS = 700;
   const root = document.getElementById('quiz-root');
   let state = {
-    view: 'qr', name: '', playerId: '',
+    view: 'welcome', name: '', playerId: '',
     qIndex: 0, correctCount: 0, quizStartAt: 0, questionStartAt: 0, selectedIdx: null, locked: false,
     qTimer: null, players: [], presenterIndex: 0
   };
@@ -315,7 +333,7 @@
     return out;
   }
 
-  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.qr(); root.appendChild(el); }
+  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.welcome(); root.appendChild(el); }
   function h(tag, attrs, children){
     const el = document.createElement(tag);
     if (attrs) for (const k in attrs){
@@ -341,7 +359,7 @@
   function clearQTimer(){ if (state.qTimer){ clearInterval(state.qTimer); state.qTimer = null; } }
 
   function spawnConfetti(container){
-    const colors = ['#e8b84b', '#f0a8c4', '#c9a0dc', '#fbf3fa', '#7a3b82'];
+    const colors = ['#FFEAA5', '#f0a8c4', '#c9a0dc', '#fbf3fa', '#7a3b82'];
     for (let i = 0; i < 44; i++){
       const piece = document.createElement('div');
       piece.className = 'qz-confetti-piece';
@@ -359,6 +377,21 @@
   }
 
   // ---------- LANDING: game explanation (no QR here — QR lives in a separate slide) ----------
+  // ---------- SCREEN 1: QR ----------
+  // ---------- SCREEN 0: WELCOME (forum logo + event welcome) ----------
+  function ScreenWelcome(){
+    const wrap = h('div', {class:'qz-screen'});
+    wrap.appendChild(h('div', {class:'qz-ring-wrap'}, [
+      h('div', {class:'qz-ring-glow'}),
+      h('div', {class:'qz-font-display', style:'font-size:15px; z-index:1; letter-spacing:1px; line-height:1.3; max-width:100px;'}, ['פורום נשות המילואימניקים'])
+    ]));
+    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['פורום נשות המילואימניקים']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['ברוכה הבאה לאירוע']));
+    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ערב הוקרה עבור פרודות | גרושות — אמאות לילדי המילואימניקים']));
+    wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='qr'; render(); }}, ['המשך']));
+    return wrap;
+  }
+
   // ---------- SCREEN 1: QR ----------
   function ScreenQR(){
     const wrap = h('div', {class:'qz-screen'});
@@ -653,7 +686,7 @@
     if (announceBox) renderAnnounce(announceBox);
   }
 
-  const SCREENS = { 'qr': ScreenQR, 'start': ScreenStart, 'presenter': ScreenPresenter, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
+  const SCREENS = { 'welcome': ScreenWelcome, 'qr': ScreenQR, 'start': ScreenStart, 'presenter': ScreenPresenter, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
 
   function getUrlParam(name){
     try {
