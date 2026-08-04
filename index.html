@@ -7,19 +7,19 @@
 <style>
   @font-face {
     font-family: 'FbSemitrayler';
-    src: url('./fonts/FbSemitrayler-Regular.otf') format('opentype');
+    src: url('./FbSemitrayler-Regular.otf') format('opentype');
     font-weight: 400;
     font-display: swap;
   }
   @font-face {
     font-family: 'FbSemitrayler';
-    src: url('./fonts/FbSemitrayler-Bold.otf') format('opentype');
+    src: url('./FbSemitrayler-Bold.otf') format('opentype');
     font-weight: 700;
     font-display: swap;
   }
   @font-face {
     font-family: 'FbSemitrayler';
-    src: url('./fonts/FbSemitrayler-Black.otf') format('opentype');
+    src: url('./FbSemitrayler-Black.otf') format('opentype');
     font-weight: 900;
     font-display: swap;
   }
@@ -381,11 +381,7 @@
   // ---------- SCREEN 0: WELCOME (forum logo + event welcome) ----------
   function ScreenWelcome(){
     const wrap = h('div', {class:'qz-screen'});
-    wrap.appendChild(h('div', {class:'qz-ring-wrap'}, [
-      h('div', {class:'qz-ring-glow'}),
-      h('div', {class:'qz-font-display', style:'font-size:15px; z-index:1; letter-spacing:1px; line-height:1.3; max-width:100px;'}, ['פורום נשות המילואימניקים'])
-    ]));
-    wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['פורום נשות המילואימניקים']));
+    wrap.appendChild(h('img', {src:'./Forumlogo.png', alt:'פורום נשות המילואימניקים', style:'width:150px; height:150px; border-radius:50%; box-shadow:0 8px 30px rgba(0,0,0,0.35);'}));
     wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['ברוכה הבאה לאירוע']));
     wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ערב הוקרה עבור פרודות | גרושות — אמאות לילדי המילואימניקים']));
     wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='qr'; render(); }}, ['המשך']));
