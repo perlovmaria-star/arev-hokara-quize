@@ -112,6 +112,15 @@
     opacity: 0.85; transition: opacity .15s ease;
   }
   #quiz-root .qz-btn-plain-white:hover { opacity: 1; }
+  #quiz-root .qz-instr-step {
+    display: flex; align-items: flex-start; gap: 12px; width: 100%; max-width: 420px; text-align: right;
+  }
+  #quiz-root .qz-instr-num {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,234,165,0.18);
+    border: 1.5px solid var(--gold); color: var(--gold); font-family:'Heebo'; font-weight: 900; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #quiz-root .qz-instr-text { font-size: 15.5px; line-height: 1.6; color: var(--cream); padding-top: 4px; }
   #quiz-root .qz-btn {
     font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
     padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer;
@@ -262,8 +271,12 @@
     { q: 'כמה פעמים אמרת השבוע "עזבי, אני אעשה את זה לבד"?', opts: ["פעם","כמה פעמים","כמעט כל יום","זו כבר לא אמירה. זו תוכנית עבודה"], correct: 3 },
     { q: 'כמה פעמים שמעת את המשפט "אבל אתם כבר גרושים..."?', opts: ["פעם אחת","כמה פעמים","יותר מדי פעמים","אם הייתי מקבלת שקל על כל פעם, לא הייתי צריכה קרן סיוע"], correct: 3 },
     { q: 'כמה פעמים הסברת למישהו מה זה בכלל "גרושה של מילואימניק"?', opts: ["פעם אחת","כמה פעמים","איבדתי ספירה","אני כבר יכולה להעביר על זה הרצאה"], correct: 3 },
+    { q: "מה הכי מרגש אותך לקבל?", opts: ["יום בלי כביסות","קפה חם","קרם גוף","הודעה מהבנק: \"הופקדה העברה\""], correct: 3 },
     { q: 'כמה פעמים אמרת השנה "אין לי כוח"?', opts: ["פעם-פעמיים","פעם בשבוע","כמעט כל יום","זו כבר לא תחושה. זו זהות"], correct: 3 },
     { q: "כמה פעמים פתחת את הטלפון כדי לבדוק אם נכנס כסף?", opts: ["פעם ביום","כמה פעמים ביום","כל פעם שיש התראה","אני כבר יודעת לזהות את האפליקציה לפי הצליל"], correct: 3 },
+    { q: "מה הכי מלחיץ אותך?", opts: ["הטלפון מהגן","הודעה מבית הספר","הודעה מהבנק","שלוש נקודות בוואטסאפ מגרושך..."], correct: 3 },
+    { q: "מה הדבר הראשון שאת עושה כשמתפנה לך שעה?", opts: ["ישנה","מקפלת כביסה","משלימה סידורים","מבזבזת רבע שעה על להחליט במה להתחיל"], correct: 3 },
+    { q: 'כמה פעמים אמרת "יהיה בסדר" כשלא היה לך מושג איך יהיה?', opts: ["פעם","כמה פעמים","כל שבוע","זו תוכנית העבודה שלי מאז 7 באוקטובר"], correct: 3 },
     { q: "מה הסיכוי שהדר מרקס תצא מהערב הזה עם עוד חומר למופע?", opts: ["נמוך","בינוני","גבוה","אנחנו מופע שלם"], correct: 3 },
     { q: "מה הדבר הראשון שהדר תעשה כשתגיע הביתה?", opts: ["תספר על הערב לבן הזוג שלה","תכתוב רעיונות","תתקשר לסוכנת","תבדוק שאנחנו לא דורשות תמלוגים 😂"], correct: 3 },
   ];
@@ -435,9 +448,18 @@
   function ScreenStart(){
     const wrap = h('div', {class:'qz-screen'});
     wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['לפני שמתחילים']));
-    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['מי באמת מבינה את החיים שלנו?']));
-    wrap.appendChild(h('div', {class:'qz-subtitle'}, ['ענו על 11 שאלות ותיהיו מנצחות הערב']));
-    wrap.appendChild(h('div', {class:'qz-timing-card'}, ['לכל שאלה יש 20 שניות בדיוק לענות. אם הזמן נגמר בלי בחירה, המשחק ממשיך אוטומטית לשאלה הבאה.']));
+    wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['הוראות המשחק']));
+
+    const step1 = h('div', {class:'qz-instr-step'});
+    step1.appendChild(h('div', {class:'qz-instr-num'}, ['1']));
+    step1.appendChild(h('div', {class:'qz-instr-text'}, ['נרשמים למשחק עם השם המלא שלך.']));
+    wrap.appendChild(step1);
+
+    const step2 = h('div', {class:'qz-instr-step'});
+    step2.appendChild(h('div', {class:'qz-instr-num'}, ['2']));
+    step2.appendChild(h('div', {class:'qz-instr-text'}, ['לכל שאלה יש 20 שניות בדיוק לענות. אם הזמן נגמר בלי בחירה, המשחק ממשיך אוטומטית לשאלה הבאה.']));
+    wrap.appendChild(step2);
+
     wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='name'; render(); }}, ['בואי נתחיל']));
     wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.presenterIndex = 0; state.view='presenter'; render(); }}, ['🎤 מצב מנחה — הקראת שאלות']));
     wrap.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.view='host-pin'; render(); }}, ['כניסת מנחה — תוצאות']));
