@@ -121,6 +121,15 @@
     display: flex; align-items: center; justify-content: center;
   }
   #quiz-root .qz-instr-text { font-size: 15.5px; line-height: 1.6; color: var(--cream); padding-top: 4px; }
+  #quiz-root .qz-projector .qz-eyebrow { font-size: 20px; }
+  #quiz-root .qz-projector .qz-title-main { font-size: 46px; }
+  #quiz-root .qz-projector .qz-subtitle { font-size: 22px; max-width: 600px; }
+  #quiz-root .qz-projector .qz-qr-hint { font-size: 19px; max-width: 420px; }
+  #quiz-root .qz-projector .qz-instr-step { max-width: 560px; gap: 18px; }
+  #quiz-root .qz-projector .qz-instr-num { width: 42px; height: 42px; font-size: 20px; }
+  #quiz-root .qz-projector .qz-instr-text { font-size: 22px; }
+  #quiz-root .qz-projector .qz-btn { font-size: 22px; padding: 16px 40px; }
+  #quiz-root .qz-projector .qz-warn-banner { font-size: 17px; max-width: 560px; }
   #quiz-root .qz-btn {
     font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
     padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer;
@@ -254,6 +263,9 @@
     #quiz-root .qz-options { grid-template-columns: 1fr; }
     #quiz-root .qz-question-text { font-size: 20px; }
     #quiz-root .qz-timer-mid { width: 66px; height: 66px; }
+    #quiz-root .qz-projector .qz-title-main { font-size: 32px; }
+    #quiz-root .qz-projector .qz-subtitle { font-size: 17px; }
+    #quiz-root .qz-projector .qz-instr-text { font-size: 17px; }
     #quiz-root .qz-welcome-headline { font-size: 48px; }
     #quiz-root { margin: 0; border-radius: 0; box-shadow: none; max-width: 100%; }
     #quiz-root .qz-presenter-text { font-size: 22px; }
@@ -415,7 +427,7 @@
   // ---------- SCREEN 0: WELCOME (forum logo + event welcome) ----------
   // ---------- SCREEN 1: QR ----------
   function ScreenQR(){
-    const wrap = h('div', {class:'qz-screen'});
+    const wrap = h('div', {class:'qz-screen qz-projector'});
     wrap.appendChild(h('div', {class:'qz-ring-wrap'}, [
       h('div', {class:'qz-ring-glow'}),
       h('div', {class:'qz-font-display qz-heartbeat', style:'font-size:42px; z-index:1;'}, ['🩷'])
@@ -434,7 +446,7 @@
 
   // ---------- SCREEN 2: START OF THE GAME ----------
   function ScreenStart(){
-    const wrap = h('div', {class:'qz-screen'});
+    const wrap = h('div', {class:'qz-screen qz-projector'});
     wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['לפני שמתחילים']));
     wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['הוראות המשחק']));
 
