@@ -130,6 +130,7 @@
   #quiz-root .qz-projector .qz-instr-text { font-size: 22px; }
   #quiz-root .qz-projector .qz-btn { font-size: 22px; padding: 16px 40px; }
   #quiz-root .qz-projector .qz-warn-banner { font-size: 17px; max-width: 560px; }
+  #quiz-root .qz-projector .qz-reset-link { font-size: 16px; }
   #quiz-root .qz-btn {
     font-family: 'Assistant', sans-serif; font-weight: 700; font-size: 17px;
     padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer;
@@ -492,7 +493,6 @@
   const HADAR_OUTRO = { title: 'הדר את מלכה!', lines: ['וזהו, הדר… סיימנו לחקור 😇', 'תודה שהיית איתנו,', 'ותודה שגרמת לערב הזה לקרות ❤️'] };
 
   function ScreenPresenter(){
-    const wrap = h('div', {class:'qz-screen'});
     const idx = state.presenterIndex || 0;
     const afterQuestions = QUESTIONS.length; // last real-question index
     const hadarIntroIdx = afterQuestions + 1;
@@ -500,6 +500,8 @@
     const hadarQ2Idx = afterQuestions + 3;
     const hadarOutroIdx = afterQuestions + 4;
     const lastIdx = hadarOutroIdx;
+    const isBookend = (idx === 0 || idx === hadarIntroIdx || idx === hadarOutroIdx || idx > lastIdx);
+    const wrap = h('div', {class:'qz-screen' + (isBookend ? ' qz-projector' : '')});
 
     if (idx === 0){
       wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['מצב מנחה']));
@@ -520,7 +522,7 @@
       });
       wrap.appendChild(opts);
     } else if (idx === hadarIntroIdx){
-      wrap.appendChild(h('div', {style:'font-size:40px;'}, ['🩷']));
+      wrap.appendChild(h('div', {style:'font-size:60px;'}, ['🩷']));
       wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, [HADAR_INTRO.title]));
       HADAR_INTRO.lines.forEach(line => wrap.appendChild(h('div', {class:'qz-subtitle', style:'font-weight:700; color: var(--cream);'}, [line])));
     } else if (idx === hadarQ1Idx || idx === hadarQ2Idx){
@@ -538,11 +540,11 @@
       });
       wrap.appendChild(opts);
     } else if (idx === hadarOutroIdx){
-      wrap.appendChild(h('div', {style:'font-size:44px;'}, ['👑']));
+      wrap.appendChild(h('div', {style:'font-size:64px;'}, ['👑']));
       wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, [HADAR_OUTRO.title]));
       HADAR_OUTRO.lines.forEach(line => wrap.appendChild(h('div', {class:'qz-subtitle', style:'font-weight:700; color: var(--cream);'}, [line])));
     } else {
-      wrap.appendChild(h('div', {style:'font-size:44px;'}, ['🩷']));
+      wrap.appendChild(h('div', {style:'font-size:64px;'}, ['🩷']));
       wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['זהו, סיימנו!']));
     }
 
