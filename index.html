@@ -156,7 +156,10 @@
     font-size: 20px; font-weight: 600; padding: 22px 18px; border-radius: 18px;
     border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06);
     text-align:center; min-height: 80px; display:flex; align-items:center; justify-content:center;
+    cursor: pointer; transition: all .15s ease;
   }
+  #quiz-root .qz-presenter-opt:hover { border-color: var(--pink); background: rgba(240,168,196,0.12); transform: translateY(-2px); }
+  #quiz-root .qz-presenter-opt.qz-presenter-opt-selected { border-color: var(--gold); background: rgba(255,234,165,0.2); }
   #quiz-root .qz-presenter-nav { display:flex; gap:14px; margin-top: 26px; }
   #quiz-root .qz-error { color: var(--pink); font-size: 14px; min-height: 18px; }
   #quiz-root .qz-qnum { color: var(--muted); font-size: 13.5px; letter-spacing: 1px; }
@@ -284,7 +287,7 @@
   const FEEDBACK_MS = 700;
   const root = document.getElementById('quiz-root');
   let state = {
-    view: 'welcome', name: '', playerId: '',
+    view: 'qr', name: '', playerId: '',
     qIndex: 0, correctCount: 0, quizStartAt: 0, questionStartAt: 0, selectedIdx: null, locked: false,
     qTimer: null, players: [], presenterIndex: 0
   };
@@ -364,7 +367,7 @@
     return out;
   }
 
-  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.welcome(); root.appendChild(el); }
+  function render(){ root.innerHTML = ''; const el = SCREENS[state.view] ? SCREENS[state.view]() : SCREENS.qr(); root.appendChild(el); }
   function h(tag, attrs, children){
     const el = document.createElement(tag);
     if (attrs) for (const k in attrs){
@@ -410,16 +413,6 @@
   // ---------- LANDING: game explanation (no QR here — QR lives in a separate slide) ----------
   // ---------- SCREEN 1: QR ----------
   // ---------- SCREEN 0: WELCOME (forum logo + event welcome) ----------
-  function ScreenWelcome(){
-    const wrap = h('div', {class:'qz-screen'});
-    wrap.appendChild(h('img', {src:'./Forumlogo.png', alt:'פורום נשות המילואימניקים', style:'width:72px; height:72px; border-radius:50%; box-shadow:0 6px 20px rgba(0,0,0,0.3); margin-bottom:2px;'}));
-    wrap.appendChild(h('div', {class:'qz-welcome-headline qz-font-display'}, ['ערב הוקרה']));
-    wrap.appendChild(h('div', {style:'color: var(--cream); font-family:"Assistant",sans-serif; font-weight:300; font-size:26px; margin-top:-6px;'}, ['עבור']));
-    wrap.appendChild(h('div', {class:'qz-welcome-badge', style:'margin-top:-10px;'}, ['פרודות | גרושות המילואימניקים']));
-    wrap.appendChild(h('button', {class:'qz-btn-plain-white', onclick: () => { state.view='qr'; render(); }}, ['מתחילים']));
-    return wrap;
-  }
-
   // ---------- SCREEN 1: QR ----------
   function ScreenQR(){
     const wrap = h('div', {class:'qz-screen'});
@@ -452,7 +445,7 @@
 
     const step2 = h('div', {class:'qz-instr-step'});
     step2.appendChild(h('div', {class:'qz-instr-num'}, ['2']));
-    step2.appendChild(h('div', {class:'qz-instr-text'}, ['לכל שאלה יש 20 שניות בדיוק לענות. אם הזמן נגמר בלי בחירה, המשחק ממשיך אוטומטית לשאלה הבאה.']));
+    step2.appendChild(h('div', {class:'qz-instr-text'}, ['עונים על כל שאלה ולוחצים "הבאה" כדי להמשיך לשאלה הבאה.']));
     wrap.appendChild(step2);
 
     wrap.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='name'; render(); }}, ['בואי נתחיל']));
@@ -479,32 +472,73 @@
   }
 
   // ---------- PRESENTER MODE (host's shared screen — reads questions aloud, no scoring/timer) ----------
+  const HADAR_INTRO = { title: 'רגע לפני שממשיכות… 😏', lines: ['יש לנו כמה שאלות בונוס על הדר', 'כי אחרי ערב כזה — היינו חייבות לבדוק', 'עד כמה אנחנו באמת מכירות אותה 😉'] };
+  const HADAR_QUESTIONS = [
+    { q: 'מה הסיכוי שהדר מרקס תצא מהערב הזה עם עוד חומר למופע?', opts: ['נמוך', 'בינוני', 'גבוה', 'אנחנו מופע שלם'] },
+    { q: 'מה הדבר הראשון שהדר תעשה כשתגיע הביתה?', opts: ['תספר על הערב לבן הזוג שלה', 'תכתוב רעיונות', 'תתקשר לסוכנת', 'תבדוק שאנחנו לא דורשות תמלוגים 😂'] }
+  ];
+  const HADAR_OUTRO = { title: 'הדר את מלכה!', lines: ['וזהו, הדר… סיימנו לחקור 😇', 'תודה שהיית איתנו,', 'ותודה שגרמת לערב הזה לקרות ❤️'] };
+
   function ScreenPresenter(){
     const wrap = h('div', {class:'qz-screen'});
     const idx = state.presenterIndex || 0;
+    const afterQuestions = QUESTIONS.length; // last real-question index
+    const hadarIntroIdx = afterQuestions + 1;
+    const hadarQ1Idx = afterQuestions + 2;
+    const hadarQ2Idx = afterQuestions + 3;
+    const hadarOutroIdx = afterQuestions + 4;
+    const lastIdx = hadarOutroIdx;
 
     if (idx === 0){
       wrap.appendChild(h('div', {class:'qz-eyebrow'}, ['מצב מנחה']));
       wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['מוכנות?']));
       wrap.appendChild(h('div', {class:'qz-subtitle'}, ['כל אחת עונה בטלפון שלה.']));
-    } else if (idx <= QUESTIONS.length){
+    } else if (idx <= afterQuestions){
       const q = QUESTIONS[idx-1];
-      wrap.appendChild(h('div', {class:'qz-presenter-qnum'}, ['שאלה ' + idx + ' מתוך ' + QUESTIONS.length]));
+      wrap.appendChild(h('div', {class:'qz-presenter-qnum'}, ['שאלה ' + idx + ' מתוך ' + afterQuestions]));
       wrap.appendChild(h('div', {class:'qz-presenter-text qz-font-display'}, [q.q]));
       const opts = h('div', {class:'qz-presenter-opts'});
-      q.opts.forEach(o => opts.appendChild(h('div', {class:'qz-presenter-opt'}, [o])));
+      q.opts.forEach(o => {
+        const optEl = h('div', {class:'qz-presenter-opt'}, [o]);
+        optEl.addEventListener('click', () => {
+          opts.querySelectorAll('.qz-presenter-opt').forEach(e => e.classList.remove('qz-presenter-opt-selected'));
+          optEl.classList.add('qz-presenter-opt-selected');
+        });
+        opts.appendChild(optEl);
+      });
       wrap.appendChild(opts);
+    } else if (idx === hadarIntroIdx){
+      wrap.appendChild(h('div', {style:'font-size:40px;'}, ['🩷']));
+      wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, [HADAR_INTRO.title]));
+      HADAR_INTRO.lines.forEach(line => wrap.appendChild(h('div', {class:'qz-subtitle', style:'font-weight:700; color: var(--cream);'}, [line])));
+    } else if (idx === hadarQ1Idx || idx === hadarQ2Idx){
+      const hq = idx === hadarQ1Idx ? HADAR_QUESTIONS[0] : HADAR_QUESTIONS[1];
+      wrap.appendChild(h('div', {class:'qz-presenter-qnum'}, ['שאלת בונוס — הדר מרקס']));
+      wrap.appendChild(h('div', {class:'qz-presenter-text qz-font-display'}, [hq.q]));
+      const opts = h('div', {class:'qz-presenter-opts'});
+      hq.opts.forEach(o => {
+        const optEl = h('div', {class:'qz-presenter-opt'}, [o]);
+        optEl.addEventListener('click', () => {
+          opts.querySelectorAll('.qz-presenter-opt').forEach(e => e.classList.remove('qz-presenter-opt-selected'));
+          optEl.classList.add('qz-presenter-opt-selected');
+        });
+        opts.appendChild(optEl);
+      });
+      wrap.appendChild(opts);
+    } else if (idx === hadarOutroIdx){
+      wrap.appendChild(h('div', {style:'font-size:44px;'}, ['👑']));
+      wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, [HADAR_OUTRO.title]));
+      HADAR_OUTRO.lines.forEach(line => wrap.appendChild(h('div', {class:'qz-subtitle', style:'font-weight:700; color: var(--cream);'}, [line])));
     } else {
       wrap.appendChild(h('div', {style:'font-size:44px;'}, ['🩷']));
       wrap.appendChild(h('div', {class:'qz-title-main qz-font-display'}, ['זהו, סיימנו!']));
-      wrap.appendChild(h('div', {class:'qz-subtitle'}, ['עוברות ללוח התוצאות כדי להכריז על המנצחת']));
     }
 
     const nav = h('div', {class:'qz-presenter-nav'});
     if (idx > 0){
       nav.appendChild(h('button', {class:'qz-reset-link', onclick: () => { state.presenterIndex -= 1; render(); }}, ['הקודמת']));
     }
-    if (idx <= QUESTIONS.length){
+    if (idx <= lastIdx){
       nav.appendChild(h('button', {class:'qz-btn', onclick: () => { state.presenterIndex = idx + 1; render(); }}, [idx === 0 ? 'מעבר לשאלות' : 'הבאה']));
     } else {
       nav.appendChild(h('button', {class:'qz-btn', onclick: () => { state.view='host-pin'; render(); }}, ['🏆 ללוח התוצאות']));
@@ -544,9 +578,6 @@
     const q = QUESTIONS[qi];
     const wrap = h('div', {class:'qz-screen'});
 
-    const circumference = 2 * Math.PI * 33;
-    const timerHtml = '<div class="qz-timer-mid" id="qz-qtimer"><svg width="78" height="78" viewBox="0 0 78 78"><circle class="qz-timer-bg" cx="39" cy="39" r="33"/><circle class="qz-timer-fg" cx="39" cy="39" r="33" style="stroke-dasharray:'+circumference+'; stroke-dashoffset:0;"/></svg><div class="qz-timer-num" id="qz-qtimer-num">'+QUESTION_SECONDS+'</div></div>';
-    wrap.appendChild(h('div', {html: timerHtml}));
     wrap.appendChild(h('div', {class:'qz-qnum'}, ['שאלה ' + (qi+1) + ' מתוך ' + QUESTIONS.length]));
     const track = h('div', {class:'qz-progress-track'});
     track.appendChild(h('div', {class:'qz-progress-fill', style:'width:' + Math.round((qi/QUESTIONS.length)*100) + '%;'}));
@@ -559,28 +590,9 @@
       opts.appendChild(optEl);
     });
     wrap.appendChild(opts);
+    wrap.appendChild(h('div', {id:'qz-next-nav', style:'min-height:52px; display:flex; align-items:center; justify-content:center;'}));
 
     state.questionStartAt = Date.now();
-    clearQTimer();
-    state.qTimerEpoch = (state.qTimerEpoch || 0) + 1;
-    const myEpoch = state.qTimerEpoch;
-    state.qTimer = setInterval(() => {
-      if (state.qTimerEpoch !== myEpoch){ clearInterval(state.qTimer); return; }
-      const elapsed = Date.now() - state.questionStartAt;
-      const remain = Math.max(0, QUESTION_SECONDS*1000 - elapsed);
-      const pct = remain / (QUESTION_SECONDS*1000);
-      const ringEl = root.querySelector('#qz-qtimer .qz-timer-fg');
-      const numEl = root.querySelector('#qz-qtimer-num');
-      if (ringEl){
-        ringEl.style.strokeDashoffset = circumference * (1-pct);
-        ringEl.classList.toggle('qz-timer-urgent', remain <= 2000);
-      }
-      if (numEl) numEl.textContent = Math.ceil(remain/1000);
-      if (remain <= 0 && !state.locked){
-        selectAnswer(-1, q, qi, null);
-      }
-    }, 100);
-
     return wrap;
   }
 
@@ -588,34 +600,41 @@
     if (qi !== state.qIndex) return;
     if (state.locked) return;
     state.locked = true; state.selectedIdx = i;
-    clearQTimer();
     const correct = i === q.correct;
     if (correct) state.correctCount += 1;
     root.querySelectorAll('.qz-opt').forEach(e => e.classList.add('qz-disabled'));
     if (optEl) optEl.classList.add('qz-selected');
 
+    const isLast = qi >= QUESTIONS.length - 1;
+    const navBox = root.querySelector('#qz-next-nav');
+    if (navBox){
+      navBox.innerHTML = '';
+      const nextBtn = h('button', {class:'qz-btn'}, [isLast ? 'סיום' : 'הבאה']);
+      nextBtn.addEventListener('click', () => advanceQuestion(qi, isLast));
+      navBox.appendChild(nextBtn);
+    }
+  }
+
+  function advanceQuestion(qi, isLast){
+    const currentScreen = root.querySelector('.qz-screen');
+    if (currentScreen) currentScreen.classList.add('qz-exit');
     setTimeout(() => {
-      const currentScreen = root.querySelector('.qz-screen');
-      if (currentScreen) currentScreen.classList.add('qz-exit');
-      setTimeout(() => {
-        const isLast = qi >= QUESTIONS.length - 1;
-        if (isLast){
-          const totalTimeMs = Date.now() - state.quizStartAt;
-          const finalRecord = { name: state.name, correctCount: state.correctCount, totalTimeMs, finished: true, joinedAt: state.quizStartAt };
-          state.totalTimeMs = totalTimeMs;
-          state.view = 'finish'; render();
-          apiPost({ action: 'upsert', playerId: state.playerId, ...finalRecord }).then(() => {
-            apiVerifyPlayer(state.playerId, { correctCount: state.correctCount, finished: true }).then(verified => {
-              if (!verified && state.view === 'finish'){ state.saveFailed = true; render(); }
-            });
+      if (isLast){
+        const totalTimeMs = Date.now() - state.quizStartAt;
+        const finalRecord = { name: state.name, correctCount: state.correctCount, totalTimeMs, finished: true, joinedAt: state.quizStartAt };
+        state.totalTimeMs = totalTimeMs;
+        state.view = 'finish'; render();
+        apiPost({ action: 'upsert', playerId: state.playerId, ...finalRecord }).then(() => {
+          apiVerifyPlayer(state.playerId, { correctCount: state.correctCount, finished: true }).then(verified => {
+            if (!verified && state.view === 'finish'){ state.saveFailed = true; render(); }
           });
-        } else {
-          state.qIndex += 1; state.selectedIdx = null; state.locked = false;
-          state.view = 'question'; render();
-          setPlayer(state.playerId, { name: state.name, correctCount: state.correctCount, totalTimeMs: 0, finished: false, joinedAt: state.quizStartAt });
-        }
-      }, 220);
-    }, FEEDBACK_MS);
+        });
+      } else {
+        state.qIndex += 1; state.selectedIdx = null; state.locked = false;
+        state.view = 'question'; render();
+        setPlayer(state.playerId, { name: state.name, correctCount: state.correctCount, totalTimeMs: 0, finished: false, joinedAt: state.quizStartAt });
+      }
+    }, 220);
   }
 
   // ---------- FINISH: completion alert + warm closing message ----------
@@ -687,25 +706,25 @@
   }
   function renderAnnounce(container){
     container.innerHTML = '';
-    const winner = state.players.find(p => p.finished && p.correctCount > QUESTIONS.length/2);
+    const winner = state.players.find(p => p.finished);
     if (winner){
       container.appendChild(h('div', {class:'qz-winner-ring'}, ['🏆']));
       container.appendChild(h('div', {class:'qz-title-main qz-font-display', style:'font-size:24px;'}, [esc(winner.name)]));
-      container.appendChild(h('div', {class:'qz-subtitle'}, ['ענתה נכון על ' + winner.correctCount + ' מתוך ' + QUESTIONS.length + ' שאלות, בזמן ' + fmtTime(winner.totalTimeMs)]));
+      container.appendChild(h('div', {class:'qz-subtitle'}, ['ענתה נכון על ' + winner.correctCount + ' מתוך ' + QUESTIONS.length + ' שאלות']));
     } else {
       const stillPlaying = state.players.some(p => !p.finished);
-      container.appendChild(h('div', {class:'qz-subtitle'}, [stillPlaying ? 'עדיין יש משתתפות שממשיכות לענות...' : 'עדיין אין מי שענתה נכון על רוב השאלות']));
+      container.appendChild(h('div', {class:'qz-subtitle'}, [stillPlaying ? 'עדיין יש משתתפות שממשיכות לענות...' : 'עדיין אין משתתפות שסיימו']));
     }
   }
   function renderLeaderboardRows(container){
     container.innerHTML = '';
     if (!state.players.length){ container.appendChild(h('div', {class:'qz-small'}, ['עדיין אין משתתפות ברשימה'])); return; }
     state.players.forEach((p,i) => {
-      const isWinnerRow = i===0 && p.finished && p.correctCount > QUESTIONS.length/2;
+      const isWinnerRow = i===0 && p.finished;
       const row = h('div', {class:'qz-lb-row' + (isWinnerRow ? ' qz-lb-first' : '')});
       row.appendChild(h('div', {class:'qz-lb-rank'}, [String(i+1)]));
       row.appendChild(h('div', {class:'qz-lb-name'}, [esc(p.name)]));
-      if (p.finished) row.appendChild(h('div', {class:'qz-lb-score'}, [p.correctCount + '/' + QUESTIONS.length + ' · ' + fmtTime(p.totalTimeMs)]));
+      if (p.finished) row.appendChild(h('div', {class:'qz-lb-score'}, [p.correctCount + ' מתוך ' + QUESTIONS.length + ' נכונות']));
       else row.appendChild(h('div', {class:'qz-lb-progress'}, ['משחקת כעת...']));
       container.appendChild(row);
     });
@@ -723,7 +742,7 @@
     if (announceBox) renderAnnounce(announceBox);
   }
 
-  const SCREENS = { 'welcome': ScreenWelcome, 'qr': ScreenQR, 'start': ScreenStart, 'presenter': ScreenPresenter, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
+  const SCREENS = { 'qr': ScreenQR, 'start': ScreenStart, 'presenter': ScreenPresenter, 'name': ScreenName, 'question': ScreenQuestion, 'finish': ScreenFinish, 'host-pin': ScreenHostPin, 'results': ScreenResults };
 
   function getUrlParam(name){
     try {
